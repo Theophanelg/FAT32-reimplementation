@@ -1,0 +1,20 @@
+Réimplémentation de FAT32
+
+Le projet doit :
+- Pouvoir lister les fichiers à partir d’un chemin donné (similaire à la commande « ls »).  
+- Pouvoir lire le contenu des fichiers à partir d’un chemin donné (absolu ou relatif), de manière similaire aux commandes « more » ou « cat ».  
+- Pouvoir représenter la position actuelle dans l’arborescence des répertoires (similaire à la commande « cd »).  
+
+La création et l’écriture de fichiers seront à implémenter dans un second temps, une fois les autres fonctionnalités viables.  
+Une petite interface en ligne de commande (CLI) serait appréciée mais n’est pas obligatoire.  
+L’environnement de correction sera Linux.
+
+Contraintes et règles :
+- L’utilisation de la crate `alloc` est autorisée.  
+- Le projet doit être en mode `no_std`.  
+- Le rendu doit être fait sur MyGES sous forme d’un bundle Git. Peu ou pas de commits = note 0.  
+- Tout code « volé / emprunté » sans crédit explicite = note 0.  
+- La qualité du code est obligatoire, les tests sont obligatoires.  
+- L’utilisation de Miri / Mirai / Kani / fuzzers est considérée comme un bonus.  
+- Tout code utilisant `unsafe` doit être documenté avec `rustdoc` et inclure un commentaire de sécurité.  
+- Ce travail doit être réalisé seul pour cette partie du projet.
