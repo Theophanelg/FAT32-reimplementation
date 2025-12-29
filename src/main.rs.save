@@ -1,0 +1,8 @@
+
+use core::panic::PanicInfo;
+
+/// Cette fonction sera appeler à chaque panic.
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    loop {}
+}
