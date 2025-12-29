@@ -1,4 +1,3 @@
-
 #[repr(packed)]
 struct BootSector {
 	/// Offset 11-12 : bytes par secteur (512)
@@ -7,8 +6,11 @@ struct BootSector {
 	/// Offset 13 : secteurs par cluster
 	sectors_per_cluster: u8,
 	
+	/// Offset 14 : secteurs reservée
+	reserved_sectors: u8,
+
 	/// Padding jusqu'à l'offset 44
-	padding1: [u8; 30],
+	padding1: [u8; 29],
 	
 	/// Offset 44-47 : premier cluster du répertoire root (FAT32)
 	root_cluster: u32,
