@@ -1,11 +1,19 @@
 [package]
-name = "FAT32-reimplementation"
+name = "fat32_reimplementation"
 version = "0.1.0"
 edition = "2021"
 authors = ["Author Name <t.legrand@myskolae.fr>"]
 
+[[bin]]
+name = "fat32_reimplementation"
+path = "src/main.rs"
+
+[lib]
+name = "fat32_reimplementation"
+path = "src/libs.rs"
+
 [profile.dev]
 panic = "abort"
 
-x[profile.release]
+[profile.release]
 panic = "abort"
