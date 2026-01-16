@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #[repr(packed)]
 pub struct BootSector {
+	_boot_code: [u8; 11],
 	bytes_per_sector: u16,		// Offset 11-12 : bytes par secteur (512)
 	sectors_per_cluster: u8, 	// Offset 13 : secteurs par cluster (8)	
 	reserved_sectors: u8,		// Offset 14 : secteurs réservés (32)
