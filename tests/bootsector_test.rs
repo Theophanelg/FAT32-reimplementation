@@ -43,7 +43,7 @@ fn test_fat_offset() {
 
 #[test]
 fn test_real_boot_sector() -> Result<(), Box<dyn std::error::Error>> {
-    let sector = std::fs::read("../disque.img")?;
+    let sector = std::fs::read("tests/testdata/boot_sector.bin")?;
     let bs = unsafe { BootSector::from_bytes(&sector[..62]) };
     
     assert_eq!(bs.bytes_per_sector(), 512);
