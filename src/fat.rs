@@ -26,4 +26,14 @@ impl<D: BlockDevice> FatVolume<D> {
     pub fn bytes_per_sector(&self) -> u16 {
         self.boot.bytes_per_sector()
     }
+
+    pub fn read_cluster(&self, cluster: u32, data: &mut [u8]) -> Result<(), FatError> {
+        let sector_start = 2065;
+        if data.len() != 512 {
+            return Err(FatError::BadData);
+        }
+
+        self.device.read_sector(sector_start + (cluster as u64 - 2), data)?;
+        Ok(())
+    }
 }

@@ -14,4 +14,3 @@ pub enum FatError {
 pub trait BlockDevice {
     fn read_sector(&self, num: u64, buffer: &mut [u8]) -> Result<(), FatError>;
 }
-
