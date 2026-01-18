@@ -11,11 +11,11 @@ impl BlockDevice for MockDevice {
                 buffer[13] = 0x08;
                 buffer[14] = 0x01;
                 buffer[15] = 0x02;
-                buffer[16] = 0x00; buffer[17] = 0x00;
-                buffer[44] = 0x02; buffer[45] = 0x00; buffer[46] = 0x00; buffer[47] = 0x00;
+                buffer[44..48].copy_from_slice(&2u32.to_le_bytes());
                 Ok(())
             }
-            2065 => { buffer[0] = 0xf8; Ok(()) }
+            2065 => { buffer[0] = 0xf8; Ok(()) },
+            2066 => { buffer[0] = 0xAA; Ok(()) },
             _ => Err(FatError::BadData),
         }
     }
@@ -38,4 +38,14 @@ fn test_read_root() {
     let root_entry = volume.read_root().unwrap();
     assert_eq!(root_entry.name[0], 0xf8);
     assert_eq!(root_entry.first_cluster, 3);
+}
+
+#[test]
+fn test_read_file_cluster() {
+    let mock = MockDevice;
+    let volume = FatVolume::new(mock).unwrap();
+    let root_entry = volume.read_root().unwrap();
+    let mut file_data = [0u8;512];
+    volume.read_file_cluster(&root_entry, &mut file_data).unwrap();
+    assert_eq!(file_data[0], 0xAA);
 }

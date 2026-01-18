@@ -1,30 +1,23 @@
-use fat32_reimplementation::{BlockDevice, BootSector, FatError};
+use fat32_reimplementation::{BlockDevice,FatError};
 
-pub struct MockDevice {
-    sector0: [u8;512],
-}
-
+pub struct MockDevice;
 impl BlockDevice for MockDevice {
     fn read_sector(&self, num: u64, buffer: &mut [u8]) -> Result<(), FatError> {
-        if num != 0 {
-            return Err(FatError::BadData);
-        }
         if buffer.len() != 512 {
             return Err(FatError::BadData);
         }
-        buffer.copy_from_slice(&self.sector0);
+        match num {
+            0 => {
+                buffer[11] = 0x00; buffer[12] = 0x02;
+                buffer[13] = 0x01;
+                buffer[14] = 0x01;
+                buffer[15] = 0x02;
+                buffer[44..48].copy_from_slice(&2u32.to_le_bytes());
+            }
+            2065 => { buffer[0] = 0xf8; },
+            2066 => { buffer[0] = 0xAA; },
+            _ => return Err(FatError::BadData),
+        }
         Ok(())
     }
-}
-
-#[test]
-fn test_mock_device(){
-    let sector_bytes = include_bytes!("testdata/boot_sector.bin");
-    let mock = MockDevice {
-        sector0: sector_bytes[..].try_into().unwrap(),
-    };
-    let mut buffer = [0u8; 512];
-    mock.read_sector(0,&mut buffer).unwrap();
-    let bs = unsafe{ BootSector::from_bytes(&buffer[..62])};
-    assert_eq!(bs.bytes_per_sector(), 512);
 }

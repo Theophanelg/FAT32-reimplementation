@@ -1,4 +1,4 @@
-use fat32_reimplementation::{BootSector, FatError};
+use fat32_reimplementation::{BootSector};
 #[test]
 fn test_bootsector(){
 	let mut raw = [0u8; 62];
