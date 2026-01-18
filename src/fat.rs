@@ -1,6 +1,8 @@
 use core::result::Result;
 use super::{BootSector, BlockDevice, FatError, DirEntry, Directory};
 
+/// Volume FAT32 qui permet de lire le système de fichiers
+/// Contient le secteur de démarrage, le périphérique et le répertoire courant
 pub struct FatVolume<D: BlockDevice> {
     boot: BootSector,
     device: D,
@@ -8,6 +10,8 @@ pub struct FatVolume<D: BlockDevice> {
 }
 
 impl<D: BlockDevice> FatVolume<D> {
+    /// Crée un nouveau volume FAT32 en lisant le secteur de démarrage
+    /// Vérifie que la taille de secteur est bien 512 octets
     pub fn new(device: D) -> Result<Self, FatError> {
         let mut sector = [0u8; 512];
         device.read_sector(0, &mut sector)?;
@@ -20,14 +24,18 @@ impl<D: BlockDevice> FatVolume<D> {
         Ok(Self { boot, device, current_cluster: 2 })
     }
 
+    /// Retourne le numéro du cluster racine
     pub fn root_cluster(&self) -> u32 {
         self.boot.root_cluster()
     }
 
+    /// Retourne la taille d'un secteur en octets
     pub fn bytes_per_sector(&self) -> u16 {
         self.boot.bytes_per_sector()
     }
 
+    /// Lit un cluster entier (512 octets) depuis le volume
+    /// Le cluster 2 commence au secteur 2065
     pub fn read_cluster(&self, cluster: u32, data: &mut [u8]) -> Result<(), FatError> {
         if data.len() != 512 {
             return Err(FatError::BadData);
@@ -40,6 +48,8 @@ impl<D: BlockDevice> FatVolume<D> {
         Ok(())
     }
 
+    /// Lit l'entrée du répertoire racine
+    /// Retourne les informations de la première entrée trouvée
     pub fn read_root(&self) -> Result<DirEntry, FatError> {
         let mut data = [0u8; 512];
         self.read_cluster(2, &mut data)?;
@@ -58,11 +68,13 @@ impl<D: BlockDevice> FatVolume<D> {
         })
     }
 
+    /// Lit le contenu d'un fichier à partir de son entrée
     pub fn read_file_cluster(&self, entry: &DirEntry, data: &mut [u8]) -> Result<(), FatError> {
         self.read_cluster(entry.first_cluster, data)?;
         Ok(())
     }
 
+    /// Lit la deuxième entrée du répertoire racine (offset 32)
     pub fn read_root_entries(&self) -> Result<DirEntry, FatError> {
         let mut data = [0u8; 512];
         self.read_cluster(2, &mut data)?;
@@ -78,6 +90,8 @@ impl<D: BlockDevice> FatVolume<D> {
         Ok(DirEntry { name, attributes, first_cluster, size })
     }
 
+    /// Liste toutes les entrées du répertoire courant
+    /// Retourne jusqu'à 16 noms de fichiers/dossiers
     pub fn list_directory(&self) -> Result<Directory, FatError> {
         let mut data = [0u8; 512];
         self.read_cluster(self.current_cluster, &mut data)?;
@@ -101,17 +115,20 @@ impl<D: BlockDevice> FatVolume<D> {
         Ok(Directory { entries, count })
     }
 
+    /// Lit le contenu complet d'un cluster
     pub fn read_file(&self, cluster: u32) -> Result<[u8; 512], FatError> {
         let mut data = [0u8; 512];
         self.read_cluster(cluster, &mut data)?;
         Ok(data)
     }
 
+    /// Change le répertoire courant vers un nouveau cluster
     pub fn change_directory(&mut self, cluster: u32) -> Result<(), FatError> {
         self.current_cluster = cluster;
         Ok(())
     }
 
+    /// Retourne le numéro du cluster du répertoire courant
     pub fn current_directory(&self) -> u32 {
         self.current_cluster
     }

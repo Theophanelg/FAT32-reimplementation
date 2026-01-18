@@ -3,7 +3,6 @@ use fat32_reimplementation::{BootSector};
 fn test_bootsector(){
 	let mut raw = [0u8; 62];
 
-	// Remplit les offsets utilisés
 	raw[11..13].copy_from_slice(&512u16.to_le_bytes());
     raw[13] = 8;
     raw[14] = 32;
