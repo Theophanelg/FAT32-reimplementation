@@ -1,5 +1,9 @@
 #![allow(dead_code)]
+use core::ptr;
+
+
 #[repr(packed)]
+
 pub struct BootSector {
 	_boot_code: [u8; 11],
 	bytes_per_sector: u16,		// Offset 11-12 : bytes par secteur (512)
@@ -53,9 +57,9 @@ impl BootSector {
 	}
 
 	/// Analyser les octets bruts du secteur d'amorçage dans BootSector
-	/// `bytes` doit contenir **exactement 62 octets** valides du secteur d'amorçage
+	/// bytes doit contenir **exactement 62 octets** valides du secteur d'amorçage
 	pub unsafe fn from_bytes(bytes: &[u8]) -> Self {
 		assert_eq!(bytes.len(), 62);
-		std::ptr::read_unaligned(bytes.as_ptr() as *const BootSector)
+		ptr::read_unaligned(bytes.as_ptr() as *const BootSector)
 	}
 }
