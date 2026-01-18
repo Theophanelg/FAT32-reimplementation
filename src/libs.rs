@@ -19,6 +19,11 @@ pub struct DirEntry {
     pub size: u32,
 }
 
+pub struct Directory {
+    pub entries: [Option<[u8; 11]>; 16],
+    pub count: usize,
+}
+
 pub trait BlockDevice {
     fn read_sector(&self, num: u64, buffer: &mut [u8]) -> Result<(), FatError>;
 }

@@ -1,5 +1,5 @@
 use core::result::Result;
-use super::{BootSector, BlockDevice, FatError, DirEntry};
+use super::{BootSector, BlockDevice, FatError, DirEntry, Directory};
 
 pub struct FatVolume<D: BlockDevice> {
     boot: BootSector,
@@ -78,23 +78,27 @@ impl<D: BlockDevice> FatVolume<D> {
         Ok(DirEntry { name, attributes, first_cluster, size })
     }
 
-    pub fn list_directory(&self) -> Result<[u8; 11], FatError> {
+    pub fn list_directory(&self) -> Result<Directory, FatError> {
         let mut data = [0u8; 512];
         self.read_cluster(self.current_cluster, &mut data)?;
         
+        let mut entries = [None; 16];
+        let mut count = 0;
         let mut i = 0;
-        while i < 512 {
+        
+        while i < 512 && count < 16 {
             if data[i] == 0 {
                 break;
             }
             if data[i] != 0xE5 {
                 let mut name = [0u8; 11];
                 name.copy_from_slice(&data[i..i+11]);
-                return Ok(name);
+                entries[count] = Some(name);
+                count += 1;
             }
             i += 32;
         }
-        Err(FatError::BadData)
+        Ok(Directory { entries, count })
     }
 
     pub fn read_file(&self, cluster: u32) -> Result<[u8; 512], FatError> {

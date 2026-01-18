@@ -62,8 +62,10 @@ fn test_boot_sector_mock() {
 fn test_list_directory() {
     let mock = MockDevice;
     let volume = FatVolume::new(mock).unwrap();
-    let name = volume.list_directory().unwrap();
-    assert_eq!(name[0], 0xf8);
+    let list = volume.list_directory().unwrap();
+    assert_eq!(list.count, 2);
+    assert_eq!(list.entries[0].unwrap()[0], 0xf8);
+    assert_eq!(list.entries[1].unwrap()[0], 0xAB);
 }
 
 #[test]
