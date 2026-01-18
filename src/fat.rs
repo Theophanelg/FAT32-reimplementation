@@ -80,7 +80,7 @@ impl<D: BlockDevice> FatVolume<D> {
 
     pub fn list_directory(&self) -> Result<[u8; 11], FatError> {
         let mut data = [0u8; 512];
-        self.read_cluster(2, &mut data)?;
+        self.read_cluster(self.current_cluster, &mut data)?;
         
         let mut i = 0;
         while i < 512 {
