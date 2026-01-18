@@ -4,6 +4,7 @@ use super::{BootSector, BlockDevice, FatError, DirEntry};
 pub struct FatVolume<D: BlockDevice> {
     boot: BootSector,
     device: D,
+    current_cluster: u32,
 }
 
 impl<D: BlockDevice> FatVolume<D> {
@@ -16,7 +17,7 @@ impl<D: BlockDevice> FatVolume<D> {
         if boot.bytes_per_sector() != 512 {
             return Err(FatError::BadData);
         }
-        Ok(Self { boot, device })
+        Ok(Self { boot, device, current_cluster: 2 })
     }
 
     pub fn root_cluster(&self) -> u32 {
@@ -100,5 +101,14 @@ impl<D: BlockDevice> FatVolume<D> {
         let mut data = [0u8; 512];
         self.read_cluster(cluster, &mut data)?;
         Ok(data)
-    }   
+    }
+
+    pub fn change_directory(&mut self, cluster: u32) -> Result<(), FatError> {
+        self.current_cluster = cluster;
+        Ok(())
+    }
+
+    pub fn current_directory(&self) -> u32 {
+        self.current_cluster
+    }
 }

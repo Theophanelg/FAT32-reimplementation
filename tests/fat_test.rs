@@ -73,3 +73,12 @@ fn test_read_file() {
     let data = volume.read_file(3).unwrap();
     assert_eq!(data[0], 0xAA);
 }
+
+#[test]
+fn test_change_directory() {
+    let mock = MockDevice;
+    let mut volume = FatVolume::new(mock).unwrap();
+    assert_eq!(volume.current_directory(), 2);
+    volume.change_directory(4).unwrap();
+    assert_eq!(volume.current_directory(), 4);
+}
