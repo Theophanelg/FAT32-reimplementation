@@ -57,3 +57,11 @@ fn test_boot_sector_mock() {
     
     assert_eq!(boot.bytes_per_sector(), 512);
 }
+
+#[test]
+fn test_list_directory() {
+    let mock = MockDevice;
+    let volume = FatVolume::new(mock).unwrap();
+    let name = volume.list_directory().unwrap();
+    assert_eq!(name[0], 0xf8);
+}

@@ -76,4 +76,23 @@ impl<D: BlockDevice> FatVolume<D> {
         let size = u32::from_le_bytes([entry_bytes[28], entry_bytes[29], entry_bytes[30], entry_bytes[31]]);
         Ok(DirEntry { name, attributes, first_cluster, size })
     }
+
+    pub fn list_directory(&self) -> Result<[u8; 11], FatError> {
+        let mut data = [0u8; 512];
+        self.read_cluster(2, &mut data)?;
+        
+        let mut i = 0;
+        while i < 512 {
+            if data[i] == 0 {
+                break;
+            }
+            if data[i] != 0xE5 {
+                let mut name = [0u8; 11];
+                name.copy_from_slice(&data[i..i+11]);
+                return Ok(name);
+            }
+            i += 32;
+        }
+        Err(FatError::BadData)
+    }
 }
