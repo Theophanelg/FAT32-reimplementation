@@ -30,3 +30,12 @@ fn test_read_cluster_simple() {
     volume.read_cluster(2, &mut cluster1).unwrap();
     assert_eq!(cluster1[0], 0xf8);
 }
+
+#[test]
+fn test_read_root() {
+    let mock = MockDevice;
+    let volume = FatVolume::new(mock).unwrap();
+    let root_entry = volume.read_root().unwrap();
+    assert_eq!(root_entry.name[0], 0xf8);
+    assert_eq!(root_entry.first_cluster, 3);
+}
