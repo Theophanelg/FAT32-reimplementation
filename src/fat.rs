@@ -95,4 +95,10 @@ impl<D: BlockDevice> FatVolume<D> {
         }
         Err(FatError::BadData)
     }
+
+    pub fn read_file(&self, cluster: u32) -> Result<[u8; 512], FatError> {
+        let mut data = [0u8; 512];
+        self.read_cluster(cluster, &mut data)?;
+        Ok(data)
+    }   
 }

@@ -65,3 +65,11 @@ fn test_list_directory() {
     let name = volume.list_directory().unwrap();
     assert_eq!(name[0], 0xf8);
 }
+
+#[test]
+fn test_read_file() {
+    let mock = MockDevice;
+    let volume = FatVolume::new(mock).unwrap();
+    let data = volume.read_file(3).unwrap();
+    assert_eq!(data[0], 0xAA);
+}
