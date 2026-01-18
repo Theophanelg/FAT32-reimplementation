@@ -11,7 +11,7 @@ pub enum FatError {
     BadData,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DirEntry {
     pub name: [u8; 11],
     pub attributes: u8,

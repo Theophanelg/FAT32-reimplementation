@@ -1,26 +1,7 @@
-use fat32_reimplementation::{FatVolume, FatError, BlockDevice};
+use fat32_reimplementation::{FatVolume, BlockDevice, BootSector};
 
-#[derive(Default)]
-struct MockDevice;
-
-impl BlockDevice for MockDevice {
-    fn read_sector(&self, num: u64, buffer: &mut [u8]) -> Result<(), FatError> {
-        match num {
-            0 => {
-                buffer[11] = 0x00; buffer[12] = 0x02;
-                buffer[13] = 0x08;
-                buffer[14] = 0x01;
-                buffer[15] = 0x02;
-                buffer[44..48].copy_from_slice(&2u32.to_le_bytes());
-                Ok(())
-            }
-            2065 => { buffer[0] = 0xf8; Ok(()) },
-            2066 => { buffer[0] = 0xAA; Ok(()) },
-            _ => Err(FatError::BadData),
-        }
-    }
-}
-
+mod mock_devices;
+use mock_devices::MockDevice;
 
 #[test]
 fn test_read_cluster_simple() {
@@ -48,4 +29,31 @@ fn test_read_file_cluster() {
     let mut file_data = [0u8;512];
     volume.read_file_cluster(&root_entry, &mut file_data).unwrap();
     assert_eq!(file_data[0], 0xAA);
+}
+
+#[test]
+fn test_read_root_entries() {
+    let mock = MockDevice;
+    let volume = FatVolume::new(mock).unwrap();
+    
+    let mut debug_cluster = [0u8; 512];
+    volume.read_cluster(2, &mut debug_cluster).unwrap();
+    println!("Cluster 2 data[0] = {:02x}", debug_cluster[0]);
+    println!("Cluster 2 data[32] = {:02x}", debug_cluster[32]);
+    
+    let entry2 = volume.read_root_entries().unwrap();
+    assert_eq!(entry2.first_cluster, 4);
+}
+
+#[test]
+fn test_boot_sector_mock() {
+    let mock = MockDevice;
+    let mut sector = [0u8; 512];
+    mock.read_sector(0, &mut sector).unwrap();
+    
+    let boot = unsafe { BootSector::from_bytes(&sector[..62]) };
+    println!("Mock bytes_per_sector = {}", boot.bytes_per_sector());
+    println!("root_cluster = {}", boot.root_cluster());
+    
+    assert_eq!(boot.bytes_per_sector(), 512);
 }
