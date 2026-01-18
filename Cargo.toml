@@ -4,10 +4,6 @@ version = "0.1.0"
 edition = "2021"
 authors = ["Author Name <t.legrand@myskolae.fr>"]
 
-[[bin]]
-name = "fat32_reimplementation"
-path = "src/main.rs"
-
 [lib]
 name = "fat32_reimplementation"
 path = "src/libs.rs"
@@ -17,3 +13,7 @@ panic = "abort"
 
 [profile.release]
 panic = "abort"
+
+[[example]]
+name = "commandline"
+path = "exemple/commandline.rs"
