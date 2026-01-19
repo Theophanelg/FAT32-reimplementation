@@ -54,3 +54,13 @@ Le code de la bibliothèque est écrit en mode `no_std`.
 L'accès au disque est abstrait via un trait `BlockDevice`, ce qui permet :
 - de tester facilement avec un périphérique simulé
 - de réutiliser la bibliothèque dans un environnement sans OS
+
+## Quelques sources qui m'ont aider dans le projet 
+
+- https://docs.rs/fatfs/latest/fatfs/index.html
+- https://wiki.osdev.org/FAT
+- https://docs.rust-embedded.org/book/intro/no-std.html
+- https://github.com/FedericoPonzi/vfat-rs
+- https://os.phil-opp.com/fr/
+- https://doc.rust-lang.org/book/title-page.html
+
